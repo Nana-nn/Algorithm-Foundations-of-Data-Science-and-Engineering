@@ -1,0 +1,109 @@
+第一次选出包含最大的关键词的个数 
+current_selected
+np.argmax(句子里包含的关键词个数)返回对应的索引
+sentence     关键词个数cover_list_number    cover_list[i][j]
+句子1 		100		cover_list[0][i]关键词在needcover中的位置，
+		cover_list[0][1]=3代表句子1的第二个关键词位置是needcover种的第3个词
+句子2 		30
+句子3 		10	3
+句子4		5	2
+
+先选100，for i in range(0,len(cover_list_number [0])):
+		needcover_true_false_list[cover_list[0][i]]=True
+
+current_selected=np.argmax(cover_list_number)
+list_selected=[]
+origin_cover_list_number=cover_list_number   
+while len(list_selected) <k:
+	while current_selected!=np.argmax(cover_list_number   句子里包含的关键词个数):
+		此时最大的是句子2，那就先把它的和needcover_true_false_list比较，看此时的关键词个数cover_list_number 有多少	3
+		current_selected=np.argmax(cover_list_number)
+		for i in range(0,len(cover_list_number [current_selected])): #30						10
+			if cover_list_number[current_selected]=origin_cover_list_number[current_selected]:
+				if needcover_true_false_list[cover_list[current_selected][i]]==True:
+					cover_list_number [current_selected]--
+						#得到句子2实际覆盖了20	cover_list_number [current_selected]=20  3
+
+	cover_list_number[current_selected]=-1
+	list_selected.append(current_selected)
+	for i in range(0,len(origin_cover_list_number[current_selected])):
+		needcover_true_false_list[cover_list[current_selected][i]]=True
+
+原始的爬山算法：
+current_selected=np.argmax(cover_list_number)
+list_selected=[]
+origin_cover_list_number=cover_list_number   
+while len(list_selected) <k:
+	for j in range(0, len(sentences ):
+		for i in range(0,len(cover_list_number [j])):
+			if cover_list_number[current_selected]<origin_cover_list_number[current_selected]
+				break 不做后面的操作
+			if needcover_true_false_list[cover_list[j][i]]==True:
+				cover_list_number [j]--
+						
+	current_selected=np.argmax(cover_list_number)
+	cover_list_number[current_selected]=-1
+	list_selected.append(current_selected)
+	for i in range(0,len(origin_cover_list_number[current_selected])):
+		needcover_true_false_list[cover_list[current_selected][i]]=True
+
+
+
+CELF 
+抽取式的文本摘要：
+1.通过词向量或者字向量，获取句子向量和文档向量
+2.加入更多的信息权重（1句子位置信息，比如句子在开头或者最后，起着总结性的作用
+2句子占有的关键词信息，包含的词语很多的话，设计到Textrank算法和tf-tif算法3.句子长度信息，一般我们期望句子不要太长太短。
+计算每个句子最终作为摘要的可能性score 然后去选取摘要
+3.为了保证摘要的句子的多样性而使用的MMR（最大边界）算法，往往希望提取的不同句子描述的是不同的方面，这样包含的信息是会更多的
+4.为了保证句子的可读性，进行一些改进
+
+
+
+simple baseline:take the first sentence  sometimes the best snippit 
+
+基于extractive方法 无监督 基于page rank计算出每个点的pagerank score
+
+page rank 算法：越大V的人关注你作用就越大，有很多朋友关注你其实没有作用
+将网页看成sentence，用某种方式把句子的关系找出来
+
+tf-idf将文本转为向量，cosine-similarity
+LSTM应用到这里
+
+利用次模函数的特性设计文本摘要的解决方案：
+将问题抽象为一个单调非负的次模函数优化问题，每次选择摘要句子都是根据次模函数求得句子的权重分数，从而选择权重分数最大的句子放到摘要集合中，用贪心算法去求解这个函数优化问题，这个次模函数分为两部分：相关性和冗余性
+
+S表示候选摘要集 ，L(S)表示覆盖率
+其中ci(S)表示对于一个原文中待选的句子与整个当前已有的候选摘要集合的相似度
+详细的看自己的笔记
+
+构造词向量的两种方法：tfidfTransformer和CountVectorizer
+
+评估指标：
+1.算法Cover了多少个单词 关键词的覆盖率
+2.算法运行的时间
+4.摘要的可读性
+
+5.不同r下的表现
+从而选择最优的budget和r
+
+抽取式则是通过关键词筛选等方法，从原文中截取句子组成摘要，目前的方法有MMR，优化的部分TextRank
+MMR用modified求解
+
+N-grams
+如果我们仅仅是将文本字符串分割成单独的文本，此时我们只是简单的去分析文本中每个字符所代表的潜在意义与我们需要分析的结果的关系性，然而我们忽略一个非常重要的信息，文本的顺序是含有非常的重要信息
+而实际操作中，我们将这种把文本顺序保留下来的行为称之为建立N-grams模型，也就是我们将一个字符串分割成含有多个词的标识符（tokens）。当然，需要记住的一点是不论是上一节说的还是N-grams，他们都属于文本字符串Tokenization的一个过程。
+两个词（Bi-Gram）的标识符
+
+
+
+
+摘要中常见的两个度量来表示一个摘要的重要性分数，分别为相关性和冗余度。可以通过设计各种不同种类的函数来分别代表相关性和冗余度来比对提升整体方法的效果。最后我们通过一些优化算法，得到使得该函数取最大值的摘要实例。函数的设计需要满足一定的条件，具体如下：
+1、函数有不等式约束条件。每次将一个摘要句子加入到摘要集合中时，通过submodular函数能够计算得到一个增益分数，同时该操作同时也会有一定的消耗cost，对于摘要来说，可以用摘要句子的个数或者摘要集合句子中的字符（字节）总数来表示cost，当整体cost累计达到一定的上界时，我们就不能再增加摘要句子了。因此cost需要满足： 
+
+2、函数是否具有单调性。这个条件对于后续使用的优化算法有极大的影响。这也是本篇文章会着重描述的内容。下面就详细解析如何用优化算法来优化submodular函数。
+
+非单调的submodular函数
+我们首先看一个非单调submodular函数做摘要的例子。论文中给出了MMR的例子，关于MMR（Maximal Marginal Relevance）算法，同样在我之前的文章中有详细介绍，这里就不重复描述了，仅给出其公式：
+
+
